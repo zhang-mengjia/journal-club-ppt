@@ -1,0 +1,4 @@
+interface:
+  display_name: "Journal Club PPT"
+  short_description: "从论文标题制作原图主导、蓝色强调、附中文讲稿的组会 PPT"
+  default_prompt: "使用 $journal-club-ppt，为《论文标题》制作可直接汇报的 JC PPT。"
