@@ -13,6 +13,7 @@ P = "http://schemas.openxmlformats.org/presentationml/2006/main"
 NS = {"a": A, "p": P}
 E.register_namespace("a", A)
 E.register_namespace("p", P)
+LIST_BODIES = {"Outline body", "Summary body", "Discussion body"}
 PARAGRAPH_ORDER = {
     "lnSpc": 0, "spcBef": 1, "spcAft": 2, "buClrTx": 3, "buClr": 3,
     "buSzTx": 4, "buSzPct": 4, "buSzPts": 4, "buFontTx": 5, "buFont": 5,
@@ -36,7 +37,7 @@ def set_color(properties, value):
     properties.insert(0, fill)
 
 
-def format_paragraph(paragraph, item=None, summary=False):
+def format_paragraph(paragraph, item=None, is_list=False):
     props = paragraph.find("a:pPr", NS)
     if props is None:
         props = E.Element(f"{{{A}}}pPr")
@@ -65,7 +66,7 @@ def format_paragraph(paragraph, item=None, summary=False):
         ending = paragraph.find("a:endParaRPr", NS)
         if ending is not None:
             set_color(ending, color)
-        bullet = item.get("bullet", summary)
+        bullet = item.get("bullet", is_list)
         if bullet:
             level = item.get("level", 0)
             if level not in (0, 1):
@@ -95,16 +96,19 @@ def finish(source, plan_path, output):
                 item = plan["slides"][int(match.group(1)) - 1]
                 root = E.fromstring(payload)
                 for shape in root.findall(".//p:sp", NS):
+                    name = shape.find("p:nvSpPr/p:cNvPr", NS).get("name", "")
                     nonvisual = shape.find("p:nvSpPr/p:cNvSpPr", NS)
+                    if name.startswith("Figure citation "):
+                        nonvisual.set("txBox", "1")
+                        continue
                     if nonvisual is not None:
                         nonvisual.attrib.pop("txBox", None)
-                    name = shape.find("p:nvSpPr/p:cNvPr", NS).get("name", "")
                     body = shape.find("p:txBody", NS)
                     if body is None:
                         continue
                     paragraphs = body.findall("a:p", NS)
                     values = None
-                    if name == "Summary body":
+                    if name in LIST_BODIES:
                         values = item["items"]
                     elif name == "Body text":
                         values = item["paragraphs"]
@@ -113,8 +117,10 @@ def finish(source, plan_path, output):
                             raise ValueError(f"Paragraph count changed in {member.filename}.")
                         body.find("a:bodyPr", NS).set("anchor", "t")
                         for paragraph, value in zip(paragraphs, values):
-                            format_paragraph(paragraph, value, name == "Summary body")
-                    elif name.startswith("Content text") or any(text.get("name") == name for text in item.get("texts", [])):
+                            format_paragraph(paragraph, value, name in LIST_BODIES)
+                    elif name == "Question body" or name.startswith("Content text") or any(
+                        text.get("name") == name for text in item.get("texts", [])
+                    ):
                         for paragraph in paragraphs:
                             format_paragraph(paragraph)
                 payload = E.tostring(root, encoding="utf-8", xml_declaration=True)

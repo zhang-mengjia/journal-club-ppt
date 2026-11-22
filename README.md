@@ -8,9 +8,9 @@
 
 > 使用 $journal-club-ppt，为《论文标题》制作完整的组会 JC PPT，保存到我指定的文件夹。
 
-Codex 会定位正式版本，获取可访问的正文、主图和必要补充材料，按实验逻辑拆页，补充通讯作者和研究背景，并生成演讲者备注。获取不到必要材料时，会请你提供相应的 PDF 或图片。
+正式汇报从论文标题页开始。人物介绍只展示论文的通讯作者，单人页以 `Corresponding author` 为标题，合页用 `Corresponding authors`。每位通讯作者都有可编辑的 `Neurotree`，按可核实的资料标出导师和训练关系。随后用背景原图引出研究问题、结果提纲和分组汇报。
 
-默认覆盖全部主图，必要附图直接放进对应论证位置。标题、Summary、正文和页码均为原生形状内文字。图片嵌入 PPTX，来源资料另存项目目录。风格细节见 [样式规范](references/style.md)。
+结果大标题优先取自论文 Results 小节或图题，同一发现可以连续讲多页。只有同一主题出现在多页标题中时，才写成 `A | B`；单页主题直接写名称或结果句。默认覆盖全部主图，必要附图就近插入。图片嵌入 PPTX，正文和讲稿可编辑。详见[样式规范](references/style.md)与 [Bowler 现稿逐页对照](references/bowler-slide-map.md)。
 
 ![默认版式预览](assets/preview.png)
 
@@ -23,6 +23,8 @@ Codex 会定位正式版本，获取可访问的正文、主图和必要补充�
 也可以使用 Git 克隆到 Codex 的 skills 目录，目录名保持 `journal-club-ppt`。安装后重新打开 Codex 会话。
 
 ## 运行环境
+
+仓库随包提供通用 PPTX 模板、预览、版式规范与脚本，资源通过包内相对路径引用。每次制作所需的论文、图像和用户指定的模板放在当前项目中，逐页计划使用项目内的相对路径。
 
 skill 的检索、精读和内容组织由 Codex 完成。随包构建器使用 Codex Artifact Tool JavaScript 运行时，通过 `load_workspace_dependencies` 查找，再设置 `RUNTIME_NODE_MODULES`。Python 的 PDF 与图片准备工具分别使用 PyMuPDF 和 Pillow。字体默认 Arial，字体文件和运行时由目标机器提供。
 
@@ -37,6 +39,6 @@ Windows 可用已安装的 PowerPoint 逐页渲染。其他平台可使用可用
 
 仓库分发通用版式、说明和代码。实际论文、论文图片、作者肖像和用户项目资料保存在执行任务的本地项目中，遵循各自来源的使用条件。
 
-2026-11-18 使用《Subspace communication in the hippocampal–retrosplenial axis》完成从题名检索到 PPTX 的本地实测。成稿为 35 页，覆盖 5 张主图的全部 28 个 panel，并按逻辑加入必要附图，35 页均含正式中文讲稿并完成 PowerPoint 逐页渲染检查。正文采用公开作者稿全文，主图与所用附图采用出版社正式图，编号对应关系保存在本地测试项目。
+《Subspace communication in the hippocampal–retrosplenial axis》用作本机实测。结果部分覆盖 5 张主图的全部 28 个 panel，按论证顺序插入必要附图。正文依据公开作者稿，图像取自出版社正式版，图号对应关系随本地项目保存。
 
 代码与通用模板采用 MIT 许可证。
